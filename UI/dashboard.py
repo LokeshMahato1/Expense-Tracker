@@ -15,10 +15,13 @@ class Dashboard(tk.Frame):
             parent,
             bg="#f4f4f4"
         )
-        
-        self.create_widgets()
+
         self.service=service
         self.refreh_transactions=lambda: None  # Placeholder for the refresh function
+        
+        self.create_widgets()
+        self.update_total()  # Update the total spent label when the dashboard is initialized
+       
        
 
     def create_widgets(self):
@@ -27,6 +30,7 @@ class Dashboard(tk.Frame):
         )
         dashboard.pack(fill="both", expand=True, padx=30, pady=10)
         dashboard.columnconfigure((0, 1), weight=1)
+        dashboard.rowconfigure(0, weight=1)
 
         #add expense card
         add_card=tk.Frame(
@@ -101,7 +105,7 @@ class Dashboard(tk.Frame):
             bg="white",
             font=("Arial", 12, "bold")
         )
-        self.total.pack(anchor="w", padx=20, pady=10)
+        self.total.pack(anchor="w", padx=25, pady=10)
 
         #add expense button
         ttk.Button(
@@ -110,24 +114,55 @@ class Dashboard(tk.Frame):
         ).pack(pady=(5,20))
 
         # Create the spending breakdown chart.
-        fig, ax = plt.subplots(figsize=(4, 3))
+        self.fig, self.ax=plt.subplots(figsize=(4, 3))
 
-        categories = ["Food",
-                        "Entertainment",
-                        "Travel",
-                        "Health",
-                        "Housing",
-                        "Shopping",
-                        "Education",
-                        "Other"]
-        amounts = [300, 200, 150, 100,50,80,150,200]
+        totals=self.get_category_total()
+        categories=list(totals.keys())
+        amounts=list(totals.values())
 
-        ax.pie(amounts, labels=categories, autopct="%1.1f%%")
-        ax.set_title("Spending Breakdown")
+        self.ax.pie(amounts, labels=categories, autopct="%1.1f%%")
+        self.ax.set_title("Spending Breakdown")
 
-        canvas = FigureCanvasTkAgg(fig, spending_card)
-        canvas.draw()
-        canvas.get_tk_widget().pack(padx=20, pady=10)
+        self.canvas=FigureCanvasTkAgg(self.fig, master=spending_card)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack(padx=20, pady=10)
+
+    def get_category_total(self):
+        totals={}
+
+        for expense in self.service.get_expenses():
+            totals[expense.category]=totals.get(expense.category,0)+expense.amount
+
+        return totals
+
+    def update_total(self):
+        total=self.service.get_total()
+        self.total.config(text=f"Total Spent: Rs. {total:.2f}")
+
+
+    def update_chart(self):
+        self.ax.clear()
+
+        totals=self.get_category_total()
+
+        if totals:
+            self.ax.pie(
+                totals.values(),
+                labels=totals.keys(),
+                autopct="%1.1f%%"
+            )
+        else:
+            self.ax.text(0.5, 0.5, "No Data", ha="center", va="center")
+
+        self.ax.set_title("Spending Breakdown")
+        self.canvas.draw()
+
+    def clear_form(self):
+    # Clear all expense input fields.
+        self.amount.delete(0, tk.END)
+        self.category.set("")
+        self.method.set("")
+        self.description.delete(0, tk.END)
 
     def add_expense(self):
 
@@ -140,16 +175,20 @@ class Dashboard(tk.Frame):
             tk.messagebox.showerror("Missing Fields",
                                      "Please select a category and payment method.")
             return
-        
+
+        transaction_id=generate_transaction_id() if self.method.get()=="Online" else "_"
 
         expense=Expenses(
             category=self.category.get(),
             amount=float(self.amount.get()),
             description=self.description.get(),
             method=self.method.get(),
-            txn_id=generate_transaction_id(),
+            txn_id=transaction_id,
             date=datetime.now().strftime("%Y-%m-%d %H:%M")
         )
 
         self.service.add_expense(expense)
+        self.update_total()
+        self.update_chart()
         self.refresh_transactions()
+        self.clear_form()

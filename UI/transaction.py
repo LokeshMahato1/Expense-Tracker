@@ -48,7 +48,7 @@ class Transaction(tk.Frame):
         for expense in self.service.get_expenses():
             self.table.insert("", "end", values=(
                 expense.category,
-                expense.amount,
+                f"Rs.{expense.amount:.2f}",
                 expense.description,
                 expense.method,
                 expense.txn_id,

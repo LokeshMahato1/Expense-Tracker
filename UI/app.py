@@ -17,14 +17,14 @@ class ExpenseTrackerApp:
 
     def create_ui(self):
         self.service=ExpenseService()
-        
+
         self.header=Header(self.root)
         self.header.pack(fill="x")
 
-        self.dashboard=Dashboard(self.root)
+        self.dashboard=Dashboard(self.root,self.service)
         self.dashboard.pack(fill="both", expand=True)
 
-        self.transactions=Transaction(self.root)
+        self.transactions=Transaction(self.root,self.service)
         self.transactions.pack(fill="both", expand=True)
 
         self.dashboard.refresh_transactions=self.transactions.load_transactions
