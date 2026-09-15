@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter.messagebox import showinfo
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from Models.expense import Expenses
@@ -20,6 +21,7 @@ class Dashboard(tk.Frame):
         self.refreh_transactions=lambda: None  # Placeholder for the refresh function
         
         self.create_widgets()
+        self.amount.focus()
         self.update_total()  # Update the total spent label when the dashboard is initialized
        
        
@@ -66,6 +68,7 @@ class Dashboard(tk.Frame):
 
         tk.Label(add_card, text="Amount", bg="white").pack(anchor="w", padx=25)
         self.amount=ttk.Entry(add_card)
+        self.amount.bind("<Return>", lambda event: self.add_expense())
         self.amount.pack(fill="x",padx=25,pady=(3,10))
 
         tk.Label(add_card, text="Category", bg="white").pack(anchor="w", padx=25)
@@ -114,7 +117,8 @@ class Dashboard(tk.Frame):
         ).pack(pady=(5,20))
 
         # Create the spending breakdown chart.
-        self.fig, self.ax=plt.subplots(figsize=(4, 3))
+        self.fig, self.ax=plt.subplots(figsize=(4,4))
+        self.fig.tight_layout()
 
         totals=self.get_category_total()
         categories=list(totals.keys())
@@ -124,6 +128,7 @@ class Dashboard(tk.Frame):
         self.ax.set_title("Spending Breakdown")
 
         self.canvas=FigureCanvasTkAgg(self.fig, master=spending_card)
+        self.canvas.get_tk_widget().configure(bg="white")
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(padx=20, pady=10)
 
@@ -176,7 +181,7 @@ class Dashboard(tk.Frame):
                                      "Please select a category and payment method.")
             return
 
-        transaction_id=generate_transaction_id() if self.method.get()=="Online" else "_"
+        transaction_id=generate_transaction_id() if self.method.get()=="Online" else ""
 
         expense=Expenses(
             category=self.category.get(),
@@ -192,3 +197,5 @@ class Dashboard(tk.Frame):
         self.update_chart()
         self.refresh_transactions()
         self.clear_form()
+
+        messagebox=showinfo("Expense Added", "Expense has been added successfully!")

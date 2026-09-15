@@ -31,12 +31,12 @@ class Transaction(tk.Frame):
 
         columns = ("Category", "Amount","Description","Method", "TXN ID","Date")
         self.table = ttk.Treeview(card, columns=columns, show="headings")
-        self.table.column("Category", width=100, anchor="center")
-        self.table.column("Amount", width=100, anchor="center")
+        self.table.column("Category", width=120, anchor="center")
+        self.table.column("Amount", width=110, anchor="center")
         self.table.column("Description", width=150, anchor="center")
         self.table.column("Method", width=100, anchor="center")
         self.table.column("TXN ID", width=150, anchor="center")
-        self.table.column("Date", width=150, anchor="center")
+        self.table.column("Date", width=140, anchor="center")
 
         for columns in columns:
             self.table.heading(columns, text=columns, anchor="center")
@@ -51,6 +51,6 @@ class Transaction(tk.Frame):
                 f"Rs.{expense.amount:.2f}",
                 expense.description,
                 expense.method,
-                expense.txn_id,
+                expense.txn_id or "-",
                 expense.date
             ))
