@@ -63,7 +63,7 @@ class Dashboard(tk.Frame):
             add_card,
             text="Add Expense",
             bg="white",
-            font=("Arial",20,"bold")
+            font=("Arial",18,"bold")
         ).pack(anchor="w", padx=25, pady=(20,15))
 
         tk.Label(add_card, text="Amount", bg="white").pack(anchor="w", padx=25)

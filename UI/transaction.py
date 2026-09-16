@@ -30,7 +30,18 @@ class Transaction(tk.Frame):
                       anchor="w", padx=5, pady=5)
 
         columns = ("Category", "Amount","Description","Method", "TXN ID","Date")
+
+        style=ttk.Style()
+        style.configure("Treeview", rowheight=30)
+        style.configure("Treeview.Heading", font=("Arial", 10, "bold"))
+
         self.table = ttk.Treeview(card, columns=columns, show="headings")
+
+        scrollbar = ttk.Scrollbar(card, orient="vertical", command=self.table.yview)
+        scrollbar.pack(side="right", fill="y")
+
+        self.table.configure(yscrollcommand=scrollbar.set)
+
         self.table.column("Category", width=120, anchor="center")
         self.table.column("Amount", width=110, anchor="center")
         self.table.column("Description", width=150, anchor="center")
@@ -38,9 +49,16 @@ class Transaction(tk.Frame):
         self.table.column("TXN ID", width=150, anchor="center")
         self.table.column("Date", width=140, anchor="center")
 
+        
+
         for columns in columns:
             self.table.heading(columns, text=columns, anchor="center")
-            self.table.pack(fill="both", expand=True, padx=20, pady=(0,20))
+            self.table.pack(side="left", fill="both", expand=True, padx=20, pady=(0,20))
+
+        
+
+        self.table.tag_configure("even", background="#f8f8f8")
+        self.table.tag_configure("odd", background="white")
 
     def load_transactions(self):
         self.table.delete(*self.table.get_children())
@@ -53,4 +71,6 @@ class Transaction(tk.Frame):
                 expense.method,
                 expense.txn_id or "-",
                 expense.date
-            ))
+            ),
+            tags=("even" if len(self.table.get_children())%2==0 else "odd")
+            )

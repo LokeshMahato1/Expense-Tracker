@@ -9,36 +9,46 @@ class Header(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-
-        #outer rectangle
-        header_card=tk.Frame(
+    # Create the header card.
+        header_card = tk.Frame(
             self,
             bg="white",
             highlightbackground="#dddddd",
-            highlightthickness=1,
+            highlightthickness=1
         )
-        header_card.pack(fill="x", padx=5, ipady=5)
+        header_card.pack(fill="x", padx=30, pady=(20, 10))
 
         header_card.columnconfigure(0, weight=1)
         header_card.columnconfigure(1, weight=1)
         header_card.columnconfigure(2, weight=1)
 
-        #logo
-        image=Image.open("Assets/logo.png")
-        image=image.resize((60,60))
+        # Left section: logo and title.
+        left = tk.Frame(header_card, bg="white")
+        left.grid(row=0, column=0, sticky="w", padx=20, pady=10)
 
-        self.logo_image=ImageTk.PhotoImage(image)
+        image = Image.open("Assets/logo.png")
+        image = image.resize((60, 60))
+        self.logo_image = ImageTk.PhotoImage(image)
 
-        logo=tk.Label(header_card, image=self.logo_image, bg="white")
-        logo.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        tk.Label(
+            left,
+            image=self.logo_image,
+            bg="white"
+        ).pack(side="left", padx=(0, 10))
 
+        tk.Label(
+            left,
+            text="Expense Tracker",
+            bg="white",
+            fg="#222222",
+            font=("URW Chancery L", 18, "bold")
+        ).pack(side="left")
 
-        #title
-        title=tk.Label(header_card, text="Expense Tracker",bg="white", fg="#222222",
-                         font=("Arial", 24, "bold"))
-        title.grid(row=0, column=1,padx=10, pady=10, sticky="s")
-
-        #tagline
-
-        tagline=tk.Label(header_card, text="Spend • Plan • Save", bg="white", fg="#777777", font=("Arial", 12))
-        tagline.grid(row=0, column=2, padx=5, pady=5,sticky="e")
+        # Center tagline.
+        tk.Label(
+            header_card,
+            text="Track your every expenses",
+            bg="white",
+            fg="#777777",
+            font=("URW Chancery L", 18)
+        ).grid(row=0, column=1, pady=15)
